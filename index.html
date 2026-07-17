@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GRLKID — Curated Archive</title>
+<meta name="description" content="GRLKID is a curated archive of the work — and the people making it. Records are opening. Add yourself to the index." />
+<meta name="robots" content="index,follow" />
+<!-- Open Graph -->
+<meta property="og:title" content="GRLKID — Curated Archive" />
+<meta property="og:description" content="An archive in formation. Add yourself to the index." />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bone: #f2eee4;
+    --bone-2: #ece7da;
+    --ink: #0e0e0e;
+    --ink-soft: #2b2926;
+    --pink: #ff2e88;
+    --pink-deep: #e01f73;
+    --rule: rgba(14, 14, 14, 0.16);
+    --rule-strong: rgba(14, 14, 14, 0.42);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; padding: 0; background: var(--bone); color: var(--ink); }
+
+  body {
+    font-family: "Jost", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    line-height: 1.4;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  .mono { font-family: "Space Mono", "Courier New", monospace; }
+
+  /* ---- Film-frame border + registration marks ---- */
+  .frame {
+    position: fixed;
+    inset: 18px;
+    border: 1px solid var(--rule-strong);
+    pointer-events: none;
+    z-index: 5;
+  }
+  .tick {
+    position: fixed;
+    z-index: 6;
+    font-family: "Space Mono", monospace;
+    font-size: 12px;
+    color: var(--ink);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .tick.tl { top: 10px; left: 11px; }
+  .tick.tr { top: 10px; right: 11px; }
+  .tick.bl { bottom: 8px; left: 11px; }
+  .tick.br { bottom: 8px; right: 11px; }
+
+  /* ---- Shell ---- */
+  .shell {
+    position: relative;
+    z-index: 2;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 46px 34px 64px;
+  }
+
+  /* ---- Header ---- */
+  header.top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .top .mark {
+    font-weight: 600;
+    letter-spacing: 0.34em;
+    font-size: 15px;
+    text-transform: uppercase;
+  }
+  .top .meta {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    text-align: right;
+  }
+
+  /* ---- Hero ---- */
+  .hero { padding: 68px 0 40px; }
+  .kicker {
+    font-family: "Space Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--pink-deep);
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin: 0 0 30px;
+  }
+  .kicker::before {
+    content: "";
+    width: 10px; height: 10px;
+    background: var(--pink);
+    display: inline-block;
+  }
+  .wordmark {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: clamp(52px, 13vw, 128px);
+    line-height: 0.92;
+    margin: 0 0 34px;
+  }
+  .headline {
+    font-weight: 300;
+    font-size: clamp(21px, 3.4vw, 30px);
+    line-height: 1.28;
+    letter-spacing: 0.005em;
+    max-width: 20ch;
+    margin: 0 0 18px;
+  }
+  .sub {
+    font-family: "Space Mono", monospace;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    max-width: 46ch;
+    margin: 0;
+  }
+
+  /* ---- Divider label ---- */
+  .section-rule {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 8px 0 30px;
+    font-family: "Space Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .section-rule::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  /* ---- Form ---- */
+  form { margin: 0; }
+  .field { margin-bottom: 26px; }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 26px;
+  }
+  .field label {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 9px;
+    color: var(--ink);
+  }
+  .field label .idx {
+    font-family: "Space Mono", monospace;
+    font-size: 11px;
+    color: var(--pink-deep);
+    letter-spacing: 0.05em;
+  }
+  .field label .opt {
+    font-family: "Space Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin-left: auto;
+    text-transform: uppercase;
+  }
+
+  input, select {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--rule-strong);
+    border-radius: 0;
+    padding: 10px 2px;
+    font-family: "Jost", sans-serif;
+    font-size: 17px;
+    color: var(--ink);
+    letter-spacing: 0.01em;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: border-color 0.18s ease;
+  }
+  input::placeholder { color: rgba(14,14,14,0.34); font-family: "Space Mono", monospace; font-size: 13px; letter-spacing: 0.02em; }
+  input:focus, select:focus {
+    outline: none;
+    border-bottom-color: var(--pink);
+  }
+  .field.focused label .idx { color: var(--pink); }
+
+  /* Select with custom caret */
+  .select-wrap { position: relative; }
+  .select-wrap::after {
+    content: "▾";
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-55%);
+    pointer-events: none;
+    color: var(--ink);
+    font-size: 14px;
+  }
+  select { cursor: pointer; padding-right: 26px; }
+  select option { color: #0e0e0e; }
+
+  #otherWrap { display: none; margin-top: 18px; }
+  #otherWrap.show { display: block; }
+
+  /* Error text */
+  .err {
+    display: none;
+    font-family: "Space Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--pink-deep);
+    margin-top: 8px;
+    text-transform: uppercase;
+  }
+  .field.invalid .err { display: block; }
+  .field.invalid input, .field.invalid select { border-bottom-color: var(--pink-deep); }
+
+  /* Submit */
+  .actions { margin-top: 40px; }
+  button.submit {
+    width: 100%;
+    background: var(--ink);
+    color: var(--bone);
+    border: 1px solid var(--ink);
+    border-radius: 0;
+    padding: 20px 24px;
+    font-family: "Jost", sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    transition: background 0.16s ease, color 0.16s ease;
+  }
+  button.submit:hover:not(:disabled) { background: var(--pink); border-color: var(--pink); color: var(--ink); }
+  button.submit:disabled { opacity: 0.55; cursor: default; }
+  button.submit .arrow { font-family: "Space Mono", monospace; }
+
+  .formnote {
+    font-family: "Space Mono", monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    margin-top: 20px;
+    line-height: 1.6;
+    text-transform: uppercase;
+  }
+
+  /* ---- Confirmation ---- */
+  .receipt { display: none; }
+  .receipt.show { display: block; animation: fade 0.5s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .receipt .rmark {
+    font-family: "Space Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--pink-deep);
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 26px;
+  }
+  .receipt .rmark::before { content: ""; width: 10px; height: 10px; background: var(--pink); }
+  .receipt h2 {
+    font-weight: 300;
+    font-size: clamp(26px, 5vw, 40px);
+    letter-spacing: 0.02em;
+    margin: 0 0 26px;
+    line-height: 1.1;
+  }
+  .receipt .card {
+    border: 1px solid var(--rule-strong);
+    padding: 22px 24px;
+    font-family: "Space Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    max-width: 420px;
+  }
+  .receipt .card .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 8px 0;
+    border-bottom: 1px dotted var(--rule);
+  }
+  .receipt .card .row:last-child { border-bottom: none; }
+  .receipt .card .row span:first-child { color: var(--ink-soft); }
+  .receipt .card .row span:last-child { color: var(--ink); text-align: right; }
+  .receipt p.rnote {
+    font-family: "Space Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    margin-top: 26px;
+    max-width: 44ch;
+    line-height: 1.7;
+  }
+
+  /* ---- Footer ---- */
+  footer.bottom {
+    margin-top: 70px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    font-family: "Space Mono", monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 560px) {
+    .frame { inset: 10px; }
+    .shell { padding: 34px 22px 48px; }
+    .hero { padding: 46px 0 34px; }
+    .grid-2 { grid-template-columns: 1fr; }
+    footer.bottom { flex-direction: column; gap: 6px; }
+    .tick.tl, .tick.tr { top: 6px; }
+    .tick.bl, .tick.br { bottom: 4px; }
+  }
+</style>
+</head>
+<body>
+  <div class="frame" aria-hidden="true"></div>
+  <span class="tick tl mono" aria-hidden="true">+</span>
+  <span class="tick tr mono" aria-hidden="true">+</span>
+  <span class="tick bl mono" aria-hidden="true">+</span>
+  <span class="tick br mono" aria-hidden="true">+</span>
+
+  <div class="shell">
+    <header class="top">
+      <div class="mark">GRLKID</div>
+      <div class="meta mono">No. 001<br />Index in formation</div>
+    </header>
+
+    <section class="hero">
+      <p class="kicker mono">An archive in formation</p>
+      <h1 class="wordmark">GRLKID</h1>
+      <p class="headline">A curated archive of the work — and the people making it.</p>
+      <p class="sub mono">Records are opening. Add yourself to the index.</p>
+    </section>
+
+    <!-- FORM -->
+    <div id="formBlock">
+      <div class="section-rule mono">Request entry</div>
+      <form id="waitlist" novalidate>
+        <div class="field" data-field>
+          <label for="name"><span class="idx mono">01</span> Name</label>
+          <input id="name" name="name" type="text" autocomplete="name" placeholder="First and last" required />
+          <div class="err mono">Enter your name.</div>
+        </div>
+
+        <div class="field" data-field>
+          <label for="creator_type"><span class="idx mono">02</span> Discipline</label>
+          <div class="select-wrap">
+            <select id="creator_type" name="creator_type" required>
+              <option value="" disabled selected hidden>Select one</option>
+              <option>Photographer</option>
+              <option>Model</option>
+              <option>Stylist</option>
+              <option>Designer</option>
+              <option>Art Director</option>
+              <option>Makeup &amp; Hair</option>
+              <option>Writer / Editor</option>
+              <option>Casting</option>
+              <option>Producer</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="err mono">Choose a discipline.</div>
+          <div id="otherWrap">
+            <label for="creator_type_other"><span class="idx mono">02·b</span> Specify</label>
+            <input id="creator_type_other" name="creator_type_other" type="text" placeholder="Your discipline" />
+            <div class="err mono">Specify your discipline.</div>
+          </div>
+        </div>
+
+        <div class="field" data-field>
+          <label for="work_link"><span class="idx mono">03</span> Work</label>
+          <input id="work_link" name="work_link" type="text" inputmode="url" placeholder="Instagram, portfolio, or site" required />
+          <div class="err mono">Add a link to your work.</div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field" data-field>
+            <label for="phone"><span class="idx mono">04</span> Phone</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+1 000 000 0000" required />
+            <div class="err mono">Enter a valid phone number.</div>
+          </div>
+          <div class="field" data-field>
+            <label for="email"><span class="idx mono">05</span> Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@domain.com" required />
+            <div class="err mono">Enter a valid email.</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="submit" type="submit" id="submitBtn">
+            <span id="btnLabel">Add to index</span>
+            <span class="arrow" aria-hidden="true">→</span>
+          </button>
+          <div class="formnote mono" id="formError" role="alert"></div>
+          <p class="formnote mono">All fields required. No spam — we reach out only when the records open.</p>
+        </div>
+      </form>
+    </div>
+
+    <!-- CONFIRMATION -->
+    <div class="receipt" id="receipt" aria-live="polite">
+      <p class="rmark mono">Entry received</p>
+      <h2>You're in the index.</h2>
+      <div class="card mono">
+        <div class="row"><span>Status</span><span>Filed</span></div>
+        <div class="row"><span>Filed under</span><span id="rType">—</span></div>
+        <div class="row"><span>Entry no.</span><span id="rNo">—</span></div>
+      </div>
+      <p class="rnote mono">The index is closed to viewing. We'll reach you at the address on file when records open. Until then — keep making the work.</p>
+    </div>
+
+    <footer class="bottom">
+      <span>GRLKID &copy; 2026</span>
+      <span>Curated archive — Est. MMXXVI</span>
+    </footer>
+  </div>
+
+<script>
+(function () {
+  var form = document.getElementById("waitlist");
+  var typeSel = document.getElementById("creator_type");
+  var otherWrap = document.getElementById("otherWrap");
+  var otherInput = document.getElementById("creator_type_other");
+  var submitBtn = document.getElementById("submitBtn");
+  var btnLabel = document.getElementById("btnLabel");
+  var formError = document.getElementById("formError");
+
+  // focus styling
+  document.querySelectorAll("[data-field] input, [data-field] select").forEach(function (el) {
+    el.addEventListener("focus", function () { el.closest("[data-field]").classList.add("focused"); });
+    el.addEventListener("blur", function () { el.closest("[data-field]").classList.remove("focused"); });
+    el.addEventListener("input", function () { el.closest("[data-field]").classList.remove("invalid"); formError.textContent = ""; });
+    el.addEventListener("change", function () { el.closest("[data-field]").classList.remove("invalid"); });
+  });
+
+  // Other toggle
+  typeSel.addEventListener("change", function () {
+    if (typeSel.value === "Other") {
+      otherWrap.classList.add("show");
+      otherInput.setAttribute("required", "required");
+    } else {
+      otherWrap.classList.remove("show");
+      otherInput.removeAttribute("required");
+      otherInput.value = "";
+    }
+  });
+
+  function markInvalid(el) { el.closest("[data-field]").classList.add("invalid"); }
+
+  var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function validate() {
+    var ok = true;
+    var name = form.name.value.trim();
+    var type = typeSel.value;
+    var work = form.work_link.value.trim();
+    var phone = form.phone.value.trim();
+    var email = form.email.value.trim();
+
+    if (!name) { markInvalid(form.name); ok = false; }
+    if (!type) { markInvalid(typeSel); ok = false; }
+    if (type === "Other" && !otherInput.value.trim()) { markInvalid(otherInput); ok = false; }
+    if (!work) { markInvalid(form.work_link); ok = false; }
+    var digits = (phone.match(/\d/g) || []).length;
+    if (digits < 7) { markInvalid(form.phone); ok = false; }
+    if (!emailRe.test(email)) { markInvalid(form.email); ok = false; }
+    return ok;
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    formError.textContent = "";
+    if (!validate()) {
+      formError.textContent = "// Some entries need attention.";
+      return;
+    }
+
+    var payload = {
+      name: form.name.value.trim(),
+      creator_type: typeSel.value,
+      creator_type_other: typeSel.value === "Other" ? otherInput.value.trim() : "",
+      work_link: form.work_link.value.trim(),
+      phone: form.phone.value.trim(),
+      email: form.email.value.trim().toLowerCase()
+    };
+
+    submitBtn.disabled = true;
+    btnLabel.textContent = "Filing…";
+
+    fetch("/api/subscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+      .then(function (r) { return r.json().then(function (d) { return { status: r.status, body: d }; }); })
+      .then(function (res) {
+        if (res.status >= 200 && res.status < 300 && res.body && res.body.ok) {
+          showReceipt(payload);
+        } else {
+          throw new Error((res.body && res.body.error) || "Something went wrong.");
+        }
+      })
+      .catch(function (err) {
+        submitBtn.disabled = false;
+        btnLabel.textContent = "Add to index";
+        formError.textContent = "// " + (err.message || "Could not file your entry. Try again.");
+      });
+  });
+
+  function showReceipt(payload) {
+    var label = payload.creator_type === "Other" && payload.creator_type_other
+      ? payload.creator_type_other
+      : payload.creator_type;
+    document.getElementById("rType").textContent = (label || "—").toUpperCase();
+    // Archival-looking entry number derived from time
+    var n = "GK-" + Date.now().toString(36).toUpperCase().slice(-6);
+    document.getElementById("rNo").textContent = n;
+    document.getElementById("formBlock").style.display = "none";
+    document.querySelector(".section-rule") && (document.querySelector(".section-rule").style.display = "none");
+    var r = document.getElementById("receipt");
+    r.classList.add("show");
+    r.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+})();
+</script>
+</body>
+</html>

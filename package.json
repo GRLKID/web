@@ -1,0 +1,9 @@
+{
+  "name": "grlkid-waitlist",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GRLKID — landing page + waitlist intake",
+  "engines": {
+    "node": ">=18"
+  }
+}
