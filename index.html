@@ -491,9 +491,9 @@
     document.getElementById("rNo").textContent = "GK-" + Date.now().toString(36).toUpperCase().slice(-6);
     heroStatus.textContent = "Entry received";
     document.body.classList.add("filed");
-    var r = document.getElementById("receipt");
-    r.classList.add("show");
-    r.scrollIntoView({ behavior: "smooth", block: "center" });
+    document.getElementById("receipt").classList.add("show");
+    // align the form screen to the top so the hero's ENTER stays off-screen
+    document.getElementById("below").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 })();
 </script>
