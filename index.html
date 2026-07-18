@@ -71,10 +71,12 @@
   /* the narrow centered column: form, receipt, footer */
   .col { width: 100%; max-width: var(--col); margin: 0 auto; }
 
-  /* ---- cover: hero fills one viewport, grows if content is taller ---- */
+  /* ---- cover: hero fills the full screen so the form stays below the fold.
+     Use the LARGE viewport height (lvh) — dvh shrinks with mobile toolbars
+     and let the form peek into the first screen (esp. in-app browsers). ---- */
   .cover {
     min-height: 100vh;
-    min-height: 100dvh;
+    min-height: 100lvh;
     display: flex;
     flex-direction: column;
     padding: clamp(24px, 4vh, 52px) 0 clamp(22px, 3vh, 40px);
@@ -184,7 +186,7 @@
 
   /* ---- section slug ---- */
   .slug { display: flex; align-items: center; gap: 14px; margin-bottom: 40px; }
-  .slug::before, .slug::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+  .slug::before, .slug::after { content: ""; flex: 1; height: 1px; background: var(--rose); }
 
   /* ---- form ---- */
   form { margin: 0; }
@@ -291,7 +293,6 @@
   @media (max-width: 560px) {
     :root { --gut: 20px; }
     .shell { padding: 0 var(--gut) 46px; }
-    .cover { min-height: 480px; }
     .grid-2 { grid-template-columns: 1fr; gap: 24px; }
     footer { flex-direction: column; align-items: center; gap: 4px; }
   }
