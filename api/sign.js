@@ -96,7 +96,13 @@ module.exports = async function handler(req, res) {
   }
 
   // ---------- 2. notify (best-effort) ----------
-  const RESEND_KEY = process.env.RESEND_API_KEY;
+  // Accept common casings — env var names are case-sensitive and the key was
+  // saved in Vercel as `Resend_API_key`. Checking both means a later rename to
+  // the conventional SCREAMING_SNAKE_CASE keeps working with no code change.
+  const RESEND_KEY =
+    process.env.RESEND_API_KEY ||
+    process.env.Resend_API_key ||
+    process.env.RESEND_API_key;
   const FROM = process.env.NOTIFY_FROM || "GRLKID <notifications@grlkid.com>";
   let emailed = false;
 
