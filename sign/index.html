@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GRLKID — Contributor License, Issue 001</title>
+<meta name="robots" content="noindex,nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #fdfaf3;
+    --bone: #f2eee4;
+    --ink: #0e0e0e;
+    --ink-soft: #6d6a63;
+    --pink: #ff2e88;
+    --rose: #ff007f;
+    --rule: rgba(14,14,14,0.14);
+    --rule-mid: rgba(14,14,14,0.30);
+    --gut: 24px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); }
+  body {
+    font-family: "Jost", "Futura", "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  .bar { position: fixed; left: 0; right: 0; height: 12px; background: var(--ink); z-index: 8; pointer-events: none; }
+  .bar.t { top: 0; }
+  .bar.b { bottom: 0; }
+
+  .micro {
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .shell { max-width: 720px; margin: 0 auto; padding: 44px var(--gut) 72px; }
+
+  header.masthead {
+    display: flex; align-items: center; gap: 20px;
+    padding-bottom: 12px;
+  }
+  header.masthead .rule { flex: 1; height: 1px; background: var(--rose); }
+
+  h1 {
+    font-weight: 300; font-size: clamp(26px, 5vw, 38px);
+    letter-spacing: -0.015em; line-height: 1.15;
+    margin: 40px 0 6px;
+  }
+  .sub { color: var(--ink-soft); font-weight: 300; margin: 0 0 34px; }
+
+  /* ---- the document ---- */
+  .doc {
+    border-top: 1px solid var(--rule-mid);
+    border-bottom: 1px solid var(--rule-mid);
+    padding: 26px 0;
+    margin-bottom: 36px;
+  }
+  .doc h2 {
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    margin: 26px 0 8px; color: var(--ink);
+  }
+  .doc h2:first-child { margin-top: 0; }
+  .doc p { margin: 0 0 12px; font-weight: 300; font-size: 15px; }
+  .doc ul { margin: 0 0 12px; padding-left: 18px; }
+  .doc li { margin-bottom: 7px; font-weight: 300; font-size: 15px; }
+  .doc strong { font-weight: 500; }
+  .keep { background: rgba(255,46,136,0.07); border-left: 2px solid var(--pink); padding: 14px 16px; margin: 0 0 16px; }
+
+  /* ---- form ---- */
+  .field { margin-bottom: 22px; }
+  label.lb {
+    display: block; margin-bottom: 6px;
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft);
+  }
+  input[type=text], input[type=email], textarea {
+    width: 100%; background: transparent;
+    border: none; border-bottom: 1px solid var(--rule-mid); border-radius: 0;
+    padding: 8px 0; font-family: inherit; font-size: 17px; font-weight: 400;
+    color: var(--ink); -webkit-appearance: none; appearance: none;
+    transition: border-color .18s ease;
+  }
+  textarea { resize: vertical; min-height: 62px; line-height: 1.45; }
+  input::placeholder, textarea::placeholder { color: rgba(14,14,14,0.26); font-weight: 300; }
+  input:focus, textarea:focus { outline: none; border-bottom-color: var(--pink); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+
+  /* signature pad */
+  .sigwrap { position: relative; }
+  canvas.sig {
+    width: 100%; height: 190px; display: block;
+    background: #fff; border: 1px solid var(--rule-mid); border-radius: 0;
+    touch-action: none; cursor: crosshair;
+  }
+  .sigbar { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+  .sighint { font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
+  button.clear {
+    background: none; border: none; padding: 0; cursor: pointer;
+    font-family: inherit; font-size: 10px; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft);
+    text-decoration: underline; text-underline-offset: 3px;
+  }
+  button.clear:hover { color: var(--pink); }
+
+  /* checkboxes */
+  .check { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 16px; cursor: pointer; }
+  .check input { margin: 3px 0 0; width: 16px; height: 16px; accent-color: var(--pink); flex: 0 0 auto; }
+  .check span { font-size: 14px; font-weight: 300; line-height: 1.5; }
+
+  .err { display: none; margin-top: 6px; font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pink); }
+  .field.invalid .err, .check.invalid + .err { display: block; }
+  .field.invalid input, .field.invalid textarea { border-bottom-color: var(--pink); }
+  .sigwrap.invalid canvas.sig { border-color: var(--pink); }
+
+  button.submit {
+    width: 100%; margin-top: 14px;
+    background: var(--ink); color: var(--bone);
+    border: none; border-radius: 0; padding: 22px 20px;
+    font-family: inherit; font-weight: 500; font-size: 12px;
+    letter-spacing: 0.22em; text-transform: uppercase; cursor: pointer;
+    transition: background .16s ease, color .16s ease;
+  }
+  button.submit:hover:not(:disabled) { background: var(--pink); color: var(--ink); }
+  button.submit:disabled { opacity: .5; cursor: default; }
+  #formError { color: var(--pink); margin-top: 12px; text-align: center; }
+  #formError:empty { display: none; }
+  .foot { margin-top: 18px; text-align: center; }
+
+  /* ---- done state ---- */
+  .done { display: none; padding: 30px 0; text-align: center; }
+  .done.show { display: block; animation: fade .5s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .done .eye { width: 7px; height: 7px; border-radius: 50%; background: var(--pink); display: inline-block; margin-right: 8px; vertical-align: middle; }
+  .done h2 { font-weight: 300; font-size: clamp(24px, 4vw, 32px); letter-spacing: -0.015em; margin: 18px 0 16px; }
+  .done p { color: var(--ink-soft); font-weight: 300; max-width: 44ch; margin: 0 auto; }
+
+  @media (max-width: 560px) {
+    :root { --gut: 20px; }
+    .grid-2 { grid-template-columns: 1fr; gap: 22px; }
+  }
+</style>
+</head>
+<body>
+  <div class="bar t" aria-hidden="true"></div>
+  <div class="bar b" aria-hidden="true"></div>
+
+  <div class="shell">
+    <header class="masthead">
+      <span class="micro">GRLKID</span>
+      <span class="rule" aria-hidden="true"></span>
+      <span class="micro">Issue No. 001</span>
+    </header>
+
+    <div id="formBlock">
+      <h1>Contributor License</h1>
+      <p class="sub">You're in Issue 001. Before your work appears in the GRLKID app, we need your written okay — properly, rather than assuming.</p>
+
+      <div class="doc">
+        <div class="keep">
+          <p style="margin:0"><strong>You keep your work.</strong> This transfers no ownership and is non-exclusive — you stay free to show, publish, sell, and license the same work anywhere, to anyone, at any time.</p>
+        </div>
+
+        <h2>1 · What you're granting</h2>
+        <p>A non-exclusive, worldwide, royalty-free license to:</p>
+        <ul>
+          <li>reproduce and display the Work in GRLKID's printed magazine;</li>
+          <li>reproduce and display the Work in the GRLKID app and its archive;</li>
+          <li>use the Work, or part of it, to promote GRLKID and the issue it appears in, including social media and press.</li>
+        </ul>
+
+        <h2>2 · What is not included — commercial use</h2>
+        <p>This does <strong>not</strong> allow GRLKID to license, sublicense, or sell your work for any third party's commercial use — brand campaigns, sponsored drops, advertising, or merchandise. Any such use requires your separate written permission and agreed payment, each time.</p>
+
+        <h2>3 · Credit</h2>
+        <p>GRLKID will credit you by name, and handle where given, wherever the Work appears — in print and in the app — and will ask others to do the same.</p>
+
+        <h2>4 · Your confirmations</h2>
+        <p>You confirm that the Work is yours and you have the right to grant this license; that you have permission from any identifiable person appearing in the Work for it to be published as described above; and that the Work does not knowingly infringe anyone else's rights.</p>
+
+        <h2>5 · Withdrawal</h2>
+        <p>You can ask us to remove the Work from the app and archive at any time by writing to <strong>info@grlkid.com</strong>. We'll remove it within 30 days. Printed copies already made can't be recalled.</p>
+
+        <h2>6 · Term &amp; law</h2>
+        <p>This license lasts until you withdraw it under section 5. Governed by the laws of California.</p>
+      </div>
+
+      <form id="licenseForm" novalidate>
+        <div class="grid-2">
+          <div class="field" data-field>
+            <label class="lb" for="name">Full name</label>
+            <input id="name" name="name" type="text" autocomplete="name" placeholder="First and last" required />
+            <div class="err">Enter your full name.</div>
+          </div>
+          <div class="field" data-field>
+            <label class="lb" for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@domain.com" required />
+            <div class="err">Enter a valid email.</div>
+          </div>
+        </div>
+
+        <div class="field" data-field>
+          <label class="lb" for="work">The work you submitted</label>
+          <textarea id="work" name="work" placeholder="Title, series name, or a short description of the images" required></textarea>
+          <div class="err">Describe the work you submitted.</div>
+        </div>
+
+        <div class="field" data-field style="max-width:200px">
+          <label class="lb" for="initials">Initials</label>
+          <input id="initials" name="initials" type="text" maxlength="6" placeholder="e.g. SG" required />
+          <div class="err">Add your initials.</div>
+        </div>
+
+        <div class="field">
+          <label class="lb">Signature</label>
+          <div class="sigwrap" id="sigwrap">
+            <canvas class="sig" id="sigpad"></canvas>
+          </div>
+          <div class="sigbar">
+            <span class="sighint">Sign with your finger or mouse</span>
+            <button type="button" class="clear" id="clearSig">Clear</button>
+          </div>
+          <div class="err" id="sigErr">Please sign above.</div>
+        </div>
+
+        <div style="margin-top:26px">
+          <label class="check" id="chkTermsWrap">
+            <input type="checkbox" id="agreeTerms" />
+            <span>I have read and agree to this Contributor License, and I confirm the statements in section 4.</span>
+          </label>
+          <div class="err" id="termsErr">You'll need to agree to continue.</div>
+
+          <label class="check" id="chkEsignWrap">
+            <input type="checkbox" id="agreeEsign" />
+            <span>I agree to sign electronically, and that this electronic signature is as binding as a handwritten one.</span>
+          </label>
+          <div class="err" id="esignErr">You'll need to agree to sign electronically.</div>
+        </div>
+
+        <button class="submit" type="submit" id="submitBtn"><span id="btnLabel">Sign &amp; send</span></button>
+        <div class="micro" id="formError" role="alert"></div>
+        <div class="foot"><span class="micro">A copy is emailed to you and to GRLKID</span></div>
+      </form>
+    </div>
+
+    <div class="done" id="done" aria-live="polite">
+      <span class="micro"><span class="eye"></span>Signed</span>
+      <h2>Thank you — that's all we needed.</h2>
+      <p>A copy of the signed license is on its way to your inbox. If anything looks wrong, write to info@grlkid.com and we'll sort it.</p>
+    </div>
+  </div>
+
+<script>
+(function () {
+  // ---------- signature pad ----------
+  var canvas = document.getElementById('sigpad');
+  var ctx = canvas.getContext('2d');
+  var drawing = false, hasInk = false, last = null;
+
+  function fit() {
+    var ratio = window.devicePixelRatio || 1;
+    var rect = canvas.getBoundingClientRect();
+    var data = hasInk ? canvas.toDataURL() : null;
+    canvas.width = rect.width * ratio;
+    canvas.height = rect.height * ratio;
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#0e0e0e';
+    if (data) { var img = new Image(); img.onload = function(){ ctx.drawImage(img, 0, 0, rect.width, rect.height); }; img.src = data; }
+  }
+  fit();
+  window.addEventListener('resize', fit);
+
+  function pos(e) {
+    var rect = canvas.getBoundingClientRect();
+    var p = e.touches ? e.touches[0] : e;
+    return { x: p.clientX - rect.left, y: p.clientY - rect.top };
+  }
+  function start(e) { e.preventDefault(); drawing = true; last = pos(e); }
+  function move(e) {
+    if (!drawing) return;
+    e.preventDefault();
+    var p = pos(e);
+    ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+    last = p; hasInk = true;
+    document.getElementById('sigwrap').classList.remove('invalid');
+    document.getElementById('sigErr').style.display = 'none';
+  }
+  function end() { drawing = false; }
+
+  canvas.addEventListener('mousedown', start);
+  canvas.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', end);
+  canvas.addEventListener('touchstart', start, { passive: false });
+  canvas.addEventListener('touchmove', move, { passive: false });
+  canvas.addEventListener('touchend', end);
+
+  document.getElementById('clearSig').addEventListener('click', function () {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasInk = false;
+  });
+
+  // ---------- form ----------
+  var form = document.getElementById('licenseForm');
+  var submitBtn = document.getElementById('submitBtn');
+  var btnLabel = document.getElementById('btnLabel');
+  var formError = document.getElementById('formError');
+  var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  document.querySelectorAll('[data-field] input, [data-field] textarea').forEach(function (el) {
+    el.addEventListener('input', function () {
+      el.closest('[data-field]').classList.remove('invalid');
+      formError.textContent = '';
+    });
+  });
+  ['agreeTerms','agreeEsign'].forEach(function(id){
+    document.getElementById(id).addEventListener('change', function(){
+      document.getElementById(id === 'agreeTerms' ? 'termsErr' : 'esignErr').style.display = 'none';
+    });
+  });
+
+  function bad(el) { el.closest('[data-field]').classList.add('invalid'); }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    formError.textContent = '';
+    var ok = true;
+
+    var name = form.name.value.trim();
+    var email = form.email.value.trim();
+    var work = form.work.value.trim();
+    var initials = form.initials.value.trim();
+
+    if (!name) { bad(form.name); ok = false; }
+    if (!emailRe.test(email)) { bad(form.email); ok = false; }
+    if (!work) { bad(form.work); ok = false; }
+    if (!initials) { bad(form.initials); ok = false; }
+    if (!hasInk) {
+      document.getElementById('sigwrap').classList.add('invalid');
+      document.getElementById('sigErr').style.display = 'block';
+      ok = false;
+    }
+    if (!document.getElementById('agreeTerms').checked) {
+      document.getElementById('termsErr').style.display = 'block'; ok = false;
+    }
+    if (!document.getElementById('agreeEsign').checked) {
+      document.getElementById('esignErr').style.display = 'block'; ok = false;
+    }
+    if (!ok) { formError.textContent = 'Some fields still need attention'; return; }
+
+    submitBtn.disabled = true;
+    btnLabel.textContent = 'Sending…';
+
+    fetch('/api/sign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name,
+        email: email.toLowerCase(),
+        work: work,
+        initials: initials.toUpperCase(),
+        signature: canvas.toDataURL('image/png'),
+        agreed_terms: true,
+        agreed_electronic: true,
+        signed_at: new Date().toISOString(),
+        user_agent: navigator.userAgent
+      })
+    })
+      .then(function (r) { return r.json().then(function (d) { return { status: r.status, body: d }; }); })
+      .then(function (res) {
+        if (res.status >= 200 && res.status < 300 && res.body && res.body.ok) {
+          document.getElementById('formBlock').style.display = 'none';
+          document.getElementById('done').classList.add('show');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          throw new Error((res.body && res.body.error) || 'Something went wrong.');
+        }
+      })
+      .catch(function (err) {
+        submitBtn.disabled = false;
+        btnLabel.textContent = 'Sign & send';
+        formError.textContent = err.message || 'Could not send. Please try again.';
+      });
+  });
+})();
+</script>
+</body>
+</html>
