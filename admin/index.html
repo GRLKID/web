@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>GRLKID — Shop admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #fdfaf3; --bone: #f2eee4; --ink: #0e0e0e; --ink-soft: #6d6a63;
+    --pink: #ff2e88; --rose: #ff007f;
+    --rule: rgba(14,14,14,0.14); --rule-mid: rgba(14,14,14,0.30);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); }
+  body { font-family: "Jost","Helvetica Neue",Arial,sans-serif; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+
+  .micro { font-size: 10px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); }
+  .shell { max-width: 1080px; margin: 0 auto; padding: 40px 26px 90px; }
+
+  header.bar { display: flex; align-items: center; gap: 22px; padding-bottom: 12px; }
+  header.bar .rule { flex: 1; height: 1px; background: var(--rose); }
+
+  h1 { font-weight: 300; font-size: clamp(34px,6vw,58px); letter-spacing: -0.02em; margin: 40px 0 6px; }
+  .sub { font-weight: 300; color: var(--ink-soft); margin: 0 0 34px; font-size: 15px; }
+
+  /* gate */
+  .gate { max-width: 380px; margin: 12vh auto 0; }
+  .gate h1 { font-size: 38px; margin-bottom: 10px; }
+
+  input[type=text], input[type=email], input[type=number], textarea, select {
+    width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--rule-mid);
+    border-radius: 0; padding: 8px 0; font-family: inherit; font-size: 15px; color: var(--ink);
+    -webkit-appearance: none; appearance: none;
+  }
+  select { background-image: none; }
+  textarea { resize: vertical; min-height: 62px; line-height: 1.5; }
+  input:focus, textarea:focus, select:focus { outline: none; border-bottom-color: var(--pink); }
+  label.f { display: block; margin-bottom: 16px; }
+  label.f > .micro { display: block; margin-bottom: 2px; }
+
+  button {
+    font-family: inherit; border-radius: 0; cursor: pointer;
+    font-weight: 500; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  }
+  .btn { background: var(--ink); color: var(--bone); border: none; padding: 14px 20px; }
+  .btn:hover:not(:disabled) { background: var(--pink); color: var(--ink); }
+  .btn:disabled { opacity: .4; cursor: default; }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--rule-mid); }
+  .btn.ghost:hover { border-color: var(--ink); background: transparent; color: var(--ink); }
+  .btn.danger { background: transparent; color: var(--pink); border: 1px solid var(--rule); }
+  .btn.sm { padding: 9px 14px; }
+
+  .note { font-size: 13px; font-weight: 300; color: var(--ink-soft); margin-top: 14px; }
+  .flash { margin: 18px 0; padding: 12px 14px; border: 1px solid var(--rule-mid); font-size: 13px; font-weight: 300; display: none; }
+  .flash.show { display: block; }
+  .flash.bad { border-color: var(--pink); color: var(--pink); }
+
+  /* product rows */
+  .row {
+    display: grid; grid-template-columns: 92px 1fr; gap: 20px;
+    padding: 26px 0; border-top: 1px solid var(--rule);
+  }
+  .thumb {
+    width: 92px; aspect-ratio: 3/4; background: var(--bone); border: 1px solid var(--rule);
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .thumb span { font-size: 9px; letter-spacing: .14em; color: rgba(14,14,14,.25); text-transform: uppercase; }
+
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0 22px; }
+  .fields .wide { grid-column: 1 / -1; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 6px; }
+  .actions .spacer { flex: 1; }
+  .saved { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--pink); opacity: 0; transition: opacity .2s; }
+  .saved.on { opacity: 1; }
+
+  .filelabel { display: inline-block; }
+  .filelabel input { display: none; }
+
+  .newbox { border: 1px solid var(--rule-mid); padding: 24px; margin-top: 34px; }
+  .hide { display: none !important; }
+
+  @media (max-width: 680px) {
+    .fields { grid-template-columns: 1fr; }
+    .row { grid-template-columns: 1fr; }
+    .thumb { width: 120px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN GATE ============ -->
+<div class="shell gate" id="gate">
+  <span class="micro">GRLKID · internal</span>
+  <h1>Shop admin</h1>
+  <p class="sub">Sign in with your email. We'll send a one-time link — no password.</p>
+  <label class="f">
+    <span class="micro">Email</span>
+    <input type="email" id="loginEmail" autocomplete="email" placeholder="you@grlkid.com" />
+  </label>
+  <button class="btn" id="loginBtn">Send me a link</button>
+  <div class="flash" id="gateFlash"></div>
+</div>
+
+<!-- ============ ADMIN ============ -->
+<div class="shell hide" id="app">
+  <header class="bar">
+    <span class="micro">GRLKID · internal</span>
+    <span class="rule"></span>
+    <span class="micro" id="whoami"></span>
+    <button class="btn ghost sm" id="signOut">Sign out</button>
+  </header>
+
+  <h1>Shop admin</h1>
+  <p class="sub">Edit what appears on <a href="/shop">grlkid.com/shop</a>. Changes are live the moment you save.</p>
+
+  <div class="flash" id="appFlash"></div>
+
+  <div id="list"></div>
+
+  <div class="newbox">
+    <span class="micro">Add a product</span>
+    <div class="fields" style="margin-top:16px">
+      <label class="f"><span class="micro">Name</span><input type="text" id="nName" placeholder="Polka Halter"></label>
+      <label class="f"><span class="micro">Slug (url id)</span><input type="text" id="nSlug" placeholder="polka-halter"></label>
+      <label class="f"><span class="micro">Price (USD)</span><input type="number" id="nPrice" step="0.01" placeholder="75.00"></label>
+      <label class="f"><span class="micro">Sizes (comma separated)</span><input type="text" id="nSizes" placeholder="XS, S, M, L"></label>
+      <label class="f wide"><span class="micro">Tagline</span><input type="text" id="nTagline" placeholder="Cotton, hand-screened"></label>
+      <label class="f wide"><span class="micro">Description</span><textarea id="nDesc"></textarea></label>
+    </div>
+    <button class="btn" id="createBtn">Create product</button>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const SUPABASE_URL = "https://vzhbtpeafougdvssvhfb.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ6aGJ0cGVhZm91Z2R2c3N2aGZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyMzY2ODAsImV4cCI6MjA5OTgxMjY4MH0.nkuFwbUePqO3fTNQ6dBTzGLOg2f0hrpOqwyoIAipMck";
+
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const $ = (id) => document.getElementById(id);
+const gate = $("gate"), app = $("app"), list = $("list");
+
+function flash(el, msg, bad) {
+  el.textContent = msg;
+  el.classList.toggle("bad", !!bad);
+  el.classList.add("show");
+}
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+const slugify = (s) => s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+// ---------- auth ----------
+$("loginBtn").addEventListener("click", async () => {
+  const email = $("loginEmail").value.trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return flash($("gateFlash"), "Enter a valid email.", true);
+  $("loginBtn").disabled = true;
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.origin + "/admin" }
+  });
+  $("loginBtn").disabled = false;
+  if (error) return flash($("gateFlash"), error.message, true);
+  flash($("gateFlash"), "Check your email — the link signs you straight in.");
+});
+
+$("signOut").addEventListener("click", async () => {
+  await sb.auth.signOut();
+  window.location.reload();
+});
+
+sb.auth.onAuthStateChange((_e, session) => boot(session));
+boot((await sb.auth.getSession()).data.session);
+
+async function boot(session) {
+  if (!session) { gate.classList.remove("hide"); app.classList.add("hide"); return; }
+  const email = session.user.email;
+  gate.classList.add("hide");
+  app.classList.remove("hide");
+  $("whoami").textContent = email;
+  loadProducts();
+}
+
+// ---------- products ----------
+let products = [];
+
+async function loadProducts() {
+  const { data, error } = await sb.from("products").select("*").order("sort_order", { ascending: true });
+  if (error) return flash($("appFlash"), "Could not load products: " + error.message, true);
+  products = data || [];
+  renderList();
+}
+
+function renderList() {
+  if (!products.length) { list.innerHTML = '<p class="note">No products yet — add one below.</p>'; return; }
+  list.innerHTML = products.map(p => `
+    <div class="row" data-id="${p.id}">
+      <div>
+        <div class="thumb">${p.image_url
+          ? `<img src="${esc(p.image_url)}" alt="">`
+          : `<span>No photo</span>`}</div>
+        <label class="filelabel" style="margin-top:10px;display:block">
+          <span class="btn ghost sm" style="display:inline-block">Upload photo</span>
+          <input type="file" accept="image/*" data-act="upload">
+        </label>
+      </div>
+      <div>
+        <div class="fields">
+          <label class="f"><span class="micro">Name</span><input type="text" data-f="name" value="${esc(p.name)}"></label>
+          <label class="f"><span class="micro">Slug</span><input type="text" data-f="slug" value="${esc(p.slug)}"></label>
+          <label class="f"><span class="micro">Price (USD)</span><input type="number" step="0.01" data-f="price" value="${(p.price_cents/100).toFixed(2)}"></label>
+          <label class="f"><span class="micro">Sizes</span><input type="text" data-f="sizes" value="${esc((p.sizes||[]).join(', '))}"></label>
+          <label class="f"><span class="micro">Status</span>
+            <select data-f="status">
+              <option value="draft"${p.status==='draft'?' selected':''}>Draft — hidden</option>
+              <option value="live"${p.status==='live'?' selected':''}>Live</option>
+              <option value="sold_out"${p.status==='sold_out'?' selected':''}>Sold out</option>
+            </select>
+          </label>
+          <label class="f"><span class="micro">Sort order</span><input type="number" data-f="sort" value="${p.sort_order}"></label>
+          <label class="f wide"><span class="micro">Tagline</span><input type="text" data-f="tagline" value="${esc(p.tagline)}"></label>
+          <label class="f wide"><span class="micro">Description</span><textarea data-f="description">${esc(p.description)}</textarea></label>
+        </div>
+        <div class="actions">
+          <button class="btn sm" data-act="save">Save</button>
+          <span class="saved">Saved</span>
+          <span class="spacer"></span>
+          <button class="btn danger sm" data-act="delete">Delete</button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+list.addEventListener("click", async (e) => {
+  const btn = e.target.closest("button[data-act]");
+  if (!btn) return;
+  const row = btn.closest(".row");
+  const id = row.dataset.id;
+
+  if (btn.dataset.act === "save") {
+    const v = (f) => row.querySelector(`[data-f="${f}"]`).value;
+    const patch = {
+      name: v("name").trim(),
+      slug: slugify(v("slug")),
+      price_cents: Math.round(parseFloat(v("price") || "0") * 100),
+      sizes: v("sizes").split(",").map(s => s.trim()).filter(Boolean),
+      status: v("status"),
+      sort_order: parseInt(v("sort") || "0", 10),
+      tagline: v("tagline").trim(),
+      description: v("description").trim(),
+      updated_at: new Date().toISOString()
+    };
+    btn.disabled = true;
+    const { error } = await sb.from("products").update(patch).eq("id", id);
+    btn.disabled = false;
+    if (error) return flash($("appFlash"), "Save failed: " + error.message, true);
+    const tag = row.querySelector(".saved");
+    tag.classList.add("on");
+    setTimeout(() => tag.classList.remove("on"), 1600);
+    loadProducts();
+  }
+
+  if (btn.dataset.act === "delete") {
+    const p = products.find(x => x.id === id);
+    if (!confirm(`Delete "${p ? p.name : "this product"}" permanently?`)) return;
+    const { error } = await sb.from("products").delete().eq("id", id);
+    if (error) return flash($("appFlash"), "Delete failed: " + error.message, true);
+    loadProducts();
+  }
+});
+
+list.addEventListener("change", async (e) => {
+  const input = e.target.closest('input[data-act="upload"]');
+  if (!input || !input.files || !input.files[0]) return;
+  const row = input.closest(".row");
+  const id = row.dataset.id;
+  const file = input.files[0];
+
+  if (file.size > 8 * 1024 * 1024) return flash($("appFlash"), "Image is over 8MB — please compress it first.", true);
+
+  const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+  const path = `${id}-${Math.floor(performance.now())}.${ext}`;
+
+  flash($("appFlash"), "Uploading…");
+  const { error: upErr } = await sb.storage.from("product-images")
+    .upload(path, file, { cacheControl: "3600", upsert: true, contentType: file.type });
+  if (upErr) return flash($("appFlash"), "Upload failed: " + upErr.message, true);
+
+  const { data: pub } = sb.storage.from("product-images").getPublicUrl(path);
+  const { error: updErr } = await sb.from("products")
+    .update({ image_url: pub.publicUrl, updated_at: new Date().toISOString() }).eq("id", id);
+  if (updErr) return flash($("appFlash"), "Saved image but could not link it: " + updErr.message, true);
+
+  flash($("appFlash"), "Photo updated.");
+  loadProducts();
+});
+
+// ---------- create ----------
+$("createBtn").addEventListener("click", async () => {
+  const name = $("nName").value.trim();
+  if (!name) return flash($("appFlash"), "A name is required.", true);
+  const slug = slugify($("nSlug").value || name);
+  const row = {
+    name,
+    slug,
+    tagline: $("nTagline").value.trim(),
+    description: $("nDesc").value.trim(),
+    price_cents: Math.round(parseFloat($("nPrice").value || "0") * 100),
+    sizes: $("nSizes").value.split(",").map(s => s.trim()).filter(Boolean),
+    status: "draft",
+    sort_order: (products.length ? Math.max(...products.map(p => p.sort_order)) : 0) + 1
+  };
+  $("createBtn").disabled = true;
+  const { error } = await sb.from("products").insert(row);
+  $("createBtn").disabled = false;
+  if (error) return flash($("appFlash"), "Could not create: " + error.message, true);
+  ["nName","nSlug","nPrice","nSizes","nTagline","nDesc"].forEach(i => $(i).value = "");
+  flash($("appFlash"), `"${name}" created as a draft. Set it to Live when it's ready.`);
+  loadProducts();
+});
+</script>
+</body>
+</html>

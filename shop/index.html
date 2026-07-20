@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GRLKID — Shop</title>
+<meta name="description" content="Objects from the archive. Issue 001 and the first capsule." />
+<meta property="og:title" content="GRLKID — Shop" />
+<meta property="og:description" content="Objects from the archive. Issue 001 and the first capsule." />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #fdfaf3;
+    --bone: #f2eee4;
+    --ink: #0e0e0e;
+    --ink-soft: #6d6a63;
+    --pink: #ff2e88;
+    --rose: #ff007f;
+    --rule: rgba(14,14,14,0.14);
+    --rule-mid: rgba(14,14,14,0.30);
+    --gut: 26px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); }
+  body {
+    font-family: "Jost", "Futura", "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a { color: inherit; }
+
+  .bar { position: fixed; left: 0; right: 0; height: 12px; background: var(--ink); z-index: 20; pointer-events: none; }
+  .bar.t { top: 0; }
+  .bar.b { bottom: 0; }
+
+  .micro {
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .shell { max-width: 1280px; margin: 0 auto; padding: 46px var(--gut) 80px; }
+
+  /* masthead */
+  header.masthead { display: flex; align-items: center; gap: 24px; padding-bottom: 12px; }
+  header.masthead .rule { flex: 1; height: 1px; background: var(--rose); }
+  header.masthead a { text-decoration: none; }
+
+  /* title block */
+  .titleblock { padding: 60px 0 22px; }
+  h1 {
+    font-weight: 300; letter-spacing: -0.02em;
+    font-size: clamp(46px, 9vw, 104px); line-height: 0.95; margin: 0 0 18px;
+  }
+  .lede { font-weight: 300; font-size: clamp(16px, 2vw, 19px); max-width: 44ch; margin: 0; color: var(--ink-soft); }
+
+  .status-line {
+    display: flex; align-items: center; gap: 9px;
+    margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--rule);
+  }
+  .eye {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--pink);
+    box-shadow: 0 0 0 4px rgba(255,46,136,0.16);
+    animation: pulse 3.2s ease-in-out infinite; flex: 0 0 auto;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: .45 } }
+
+  /* grid */
+  .grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 44px 30px; margin-top: 54px;
+  }
+  @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); gap: 38px 22px; } }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; gap: 46px; } }
+
+  /* Cards stretch to the tallest in the row and the buy button pins to the
+     bottom, so the row of buttons lines up even when only some items have
+     sizes or a longer description. */
+  .card { display: flex; flex-direction: column; height: 100%; }
+  .card > *:nth-last-child(2) { margin-bottom: 18px; }
+  .shot {
+    position: relative; width: 100%; aspect-ratio: 3 / 4;
+    background: var(--bone); border: 1px solid var(--rule);
+    overflow: hidden; display: flex; align-items: center; justify-content: center;
+  }
+  .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .shot .ph {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.2em;
+    text-transform: uppercase; color: rgba(14,14,14,0.22);
+  }
+  .idx {
+    position: absolute; top: 10px; left: 12px;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.16em; color: var(--ink-soft);
+  }
+  .flag {
+    position: absolute; top: 10px; right: 12px;
+    font-size: 9px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase;
+    background: var(--ink); color: var(--bone); padding: 4px 8px;
+  }
+  .flag.soldout { background: transparent; color: var(--ink-soft); border: 1px solid var(--rule-mid); }
+
+  .meta { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; margin-top: 16px; }
+  .name { font-weight: 400; font-size: 19px; letter-spacing: -0.01em; }
+  .price { font-size: 13px; font-weight: 500; letter-spacing: 0.04em; white-space: nowrap; }
+  .tagline { margin-top: 3px; }
+  .desc { font-weight: 300; font-size: 14px; line-height: 1.6; color: var(--ink-soft); margin: 12px 0 0; }
+
+  .sizes { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+  .size {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 6px 11px; border: 1px solid var(--rule-mid); cursor: pointer;
+    background: transparent; font-family: inherit; color: var(--ink);
+    transition: background .14s ease, color .14s ease, border-color .14s ease;
+  }
+  .size:hover { border-color: var(--ink); }
+  .size.sel { background: var(--ink); color: var(--bone); border-color: var(--ink); }
+
+  button.buy {
+    margin-top: auto; width: 100%;
+    background: var(--ink); color: var(--bone); border: none; border-radius: 0;
+    padding: 17px 18px; font-family: inherit; font-weight: 500; font-size: 11px;
+    letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer;
+    transition: background .16s ease, color .16s ease;
+  }
+  button.buy:hover:not(:disabled) { background: var(--pink); color: var(--ink); }
+  button.buy:disabled { opacity: .4; cursor: default; }
+
+  .payline { margin-top: 54px; padding-top: 16px; border-top: 1px solid var(--rule); display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+
+  footer { margin-top: 26px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+  /* notify modal */
+  .veil {
+    position: fixed; inset: 0; background: rgba(14,14,14,0.55);
+    display: none; align-items: center; justify-content: center; z-index: 30; padding: 24px;
+  }
+  .veil.show { display: flex; }
+  .modal {
+    background: var(--bg); max-width: 420px; width: 100%; padding: 34px 30px 30px;
+    border: 1px solid var(--rule-mid); position: relative;
+  }
+  .modal h2 { font-weight: 300; font-size: 26px; letter-spacing: -0.015em; margin: 14px 0 8px; }
+  .modal p { font-weight: 300; font-size: 14px; line-height: 1.6; color: var(--ink-soft); margin: 0 0 20px; }
+  .modal input {
+    width: 100%; background: transparent; border: none;
+    border-bottom: 1px solid var(--rule-mid); border-radius: 0; padding: 9px 0;
+    font-family: inherit; font-size: 17px; color: var(--ink);
+    -webkit-appearance: none; appearance: none;
+  }
+  .modal input:focus { outline: none; border-bottom-color: var(--pink); }
+  .modal input::placeholder { color: rgba(14,14,14,0.26); font-weight: 300; }
+  .modal .err { display: none; margin-top: 7px; font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pink); }
+  .modal.invalid .err { display: block; }
+  .close {
+    position: absolute; top: 12px; right: 14px; background: none; border: none;
+    font-family: inherit; font-size: 20px; line-height: 1; cursor: pointer; color: var(--ink-soft); padding: 4px;
+  }
+  .done { display: none; }
+  .done.show { display: block; }
+  .form.hide { display: none; }
+
+  @media (max-width: 560px) { :root { --gut: 20px; } .shell { padding: 38px var(--gut) 60px; } }
+</style>
+</head>
+<body>
+  <div class="bar t" aria-hidden="true"></div>
+  <div class="bar b" aria-hidden="true"></div>
+
+  <div class="shell">
+    <header class="masthead">
+      <a href="/" class="micro">← GRLKID</a>
+      <span class="rule" aria-hidden="true"></span>
+      <span class="micro">Issue No. 001</span>
+    </header>
+
+    <section class="titleblock">
+      <h1>Shop</h1>
+      <p class="lede">Objects from the archive. The first issue, and the pieces that came with it.</p>
+      <div class="status-line">
+        <span class="eye" aria-hidden="true"></span>
+        <span class="micro" id="statusText">Opening with Issue 001 — join the list</span>
+      </div>
+    </section>
+
+    <div class="grid" id="grid">
+      <div class="micro" style="grid-column:1/-1">Loading…</div>
+    </div>
+
+    <div class="payline">
+      <span class="micro">Apple Pay · Card · Secure checkout by Stripe</span>
+      <span class="micro">Ships worldwide</span>
+    </div>
+
+    <footer>
+      <span class="micro">GRLKID &copy; 2026</span>
+      <span class="micro">Curated archive</span>
+    </footer>
+  </div>
+
+  <!-- notify modal -->
+  <div class="veil" id="veil">
+    <div class="modal" id="modal">
+      <button class="close" id="closeBtn" aria-label="Close">&times;</button>
+      <div class="form" id="modalForm">
+        <span class="micro" id="modalKicker">First access</span>
+        <h2 id="modalTitle">Get first access</h2>
+        <p id="modalCopy">We'll email you the moment it's available. Limited runs — the list goes first.</p>
+        <input id="notifyEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@domain.com" />
+        <div class="err">Enter a valid email.</div>
+        <button class="buy" id="notifySubmit" style="margin-top:22px"><span id="notifyLabel">Join the list</span></button>
+      </div>
+      <div class="done" id="modalDone">
+        <span class="micro">You're on it</span>
+        <h2>We'll be in touch.</h2>
+        <p>You'll hear from us before it goes public.</p>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  var SUPABASE_URL = "https://vzhbtpeafougdvssvhfb.supabase.co";
+  var SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ6aGJ0cGVhZm91Z2R2c3N2aGZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyMzY2ODAsImV4cCI6MjA5OTgxMjY4MH0.nkuFwbUePqO3fTNQ6dBTzGLOg2f0hrpOqwyoIAipMck";
+
+  var grid = document.getElementById("grid");
+  var veil = document.getElementById("veil");
+  var modal = document.getElementById("modal");
+  var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var current = null;
+
+  function money(cents, cur) {
+    return (cur === "usd" || !cur ? "$" : "") + (cents / 100).toFixed(2).replace(/\.00$/, "");
+  }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  fetch(SUPABASE_URL + "/rest/v1/products?select=*&order=sort_order.asc", {
+    headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY }
+  })
+    .then(function (r) { return r.json(); })
+    .then(render)
+    .catch(function () {
+      grid.innerHTML = '<div class="micro" style="grid-column:1/-1">Could not load the shop. Refresh to try again.</div>';
+    });
+
+  function render(items) {
+    if (!Array.isArray(items) || !items.length) {
+      grid.innerHTML = '<div class="micro" style="grid-column:1/-1">Nothing here yet. Check back soon.</div>';
+      return;
+    }
+    grid.innerHTML = items.map(function (p, i) {
+      var n = String(i + 1).padStart(2, "0");
+      var sold = p.status === "sold_out";
+      var shot = p.image_url
+        ? '<img src="' + esc(p.image_url) + '" alt="' + esc(p.name) + '" loading="lazy">'
+        : '<span class="ph">' + esc(p.name) + '</span>';
+      var sizes = (p.sizes && p.sizes.length)
+        ? '<div class="sizes">' + p.sizes.map(function (s) {
+            return '<button type="button" class="size" data-size="' + esc(s) + '">' + esc(s) + '</button>';
+          }).join("") + '</div>'
+        : "";
+      return '' +
+        '<article class="card" data-slug="' + esc(p.slug) + '" data-name="' + esc(p.name) + '">' +
+          '<div class="shot">' + shot +
+            '<span class="idx">' + n + '</span>' +
+            (sold ? '<span class="flag soldout">Sold out</span>' : '') +
+          '</div>' +
+          '<div class="meta"><span class="name">' + esc(p.name) + '</span>' +
+            '<span class="price">' + money(p.price_cents, p.currency) + '</span></div>' +
+          (p.tagline ? '<div class="micro tagline">' + esc(p.tagline) + '</div>' : '') +
+          (p.description ? '<p class="desc">' + esc(p.description) + '</p>' : '') +
+          sizes +
+          '<button class="buy"' + (sold ? " disabled" : "") + '>' +
+            (sold ? "Sold out" : "Notify me") + '</button>' +
+        '</article>';
+    }).join("");
+
+    grid.querySelectorAll(".size").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var wrap = b.parentElement;
+        wrap.querySelectorAll(".size").forEach(function (x) { x.classList.remove("sel"); });
+        b.classList.add("sel");
+      });
+    });
+    grid.querySelectorAll("button.buy").forEach(function (b) {
+      b.addEventListener("click", function () {
+        if (b.disabled) return;
+        var card = b.closest(".card");
+        openModal(card.dataset.slug, card.dataset.name);
+      });
+    });
+  }
+
+  function openModal(slug, name) {
+    current = slug;
+    document.getElementById("modalTitle").textContent = "First access — " + name;
+    document.getElementById("modalForm").classList.remove("hide");
+    document.getElementById("modalDone").classList.remove("show");
+    modal.classList.remove("invalid");
+    document.getElementById("notifyEmail").value = "";
+    veil.classList.add("show");
+    setTimeout(function () { document.getElementById("notifyEmail").focus(); }, 60);
+  }
+  function closeModal() { veil.classList.remove("show"); }
+
+  document.getElementById("closeBtn").addEventListener("click", closeModal);
+  veil.addEventListener("click", function (e) { if (e.target === veil) closeModal(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeModal(); });
+
+  document.getElementById("notifySubmit").addEventListener("click", function () {
+    var input = document.getElementById("notifyEmail");
+    var val = input.value.trim().toLowerCase();
+    if (!emailRe.test(val)) { modal.classList.add("invalid"); input.focus(); return; }
+    modal.classList.remove("invalid");
+    var btn = this;
+    btn.disabled = true;
+    document.getElementById("notifyLabel").textContent = "Adding…";
+
+    fetch(SUPABASE_URL + "/rest/v1/notify_requests", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: SUPABASE_KEY,
+        Authorization: "Bearer " + SUPABASE_KEY,
+        Prefer: "return=minimal"
+      },
+      body: JSON.stringify({ email: val, product_slug: current })
+    })
+      .then(function (r) {
+        if (!r.ok && r.status !== 201 && r.status !== 204) throw new Error();
+        document.getElementById("modalForm").classList.add("hide");
+        document.getElementById("modalDone").classList.add("show");
+      })
+      .catch(function () {
+        btn.disabled = false;
+        document.getElementById("notifyLabel").textContent = "Try again";
+      });
+  });
+})();
+</script>
+</body>
+</html>
