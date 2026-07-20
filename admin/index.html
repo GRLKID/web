@@ -183,6 +183,20 @@ boot((await sb.auth.getSession()).data.session);
 async function boot(session) {
   if (!session) { gate.classList.remove("hide"); app.classList.add("hide"); return; }
   const email = session.user.email;
+
+  // Anyone can request a magic link for their own address, so being signed in
+  // proves nothing. RLS is the real gate — this check just turns a silently
+  // broken page into a clear refusal. `admins_read_own` only ever returns the
+  // caller's own row, so a non-admin gets nothing back.
+  const { data: me } = await sb.from("admins").select("email").eq("email", email).maybeSingle();
+  if (!me) {
+    gate.classList.remove("hide");
+    app.classList.add("hide");
+    flash($("gateFlash"), `${email} isn't an admin on this account.`, true);
+    await sb.auth.signOut();
+    return;
+  }
+
   gate.classList.add("hide");
   app.classList.remove("hide");
   $("whoami").textContent = email;
