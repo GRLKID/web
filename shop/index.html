@@ -81,7 +81,6 @@
      bottom, so the row of buttons lines up even when only some items have
      sizes or a longer description. */
   .card { display: flex; flex-direction: column; height: 100%; }
-  .card > *:nth-last-child(2) { margin-bottom: 18px; }
   .shot {
     position: relative; width: 100%; aspect-ratio: 3 / 4;
     background: var(--bone); border: 1px solid var(--rule);
@@ -124,8 +123,13 @@
   }
 
   .ship { margin-top: 12px; color: var(--pink); }
-  .err { margin-top: 10px; color: var(--pink); min-height: 0; }
-  .err:empty { display: none; }
+
+  /* The error slot sits between the last content block and the buy button and
+     is always in the flow, empty or not. Its top margin is what guarantees
+     breathing room above the button — the button's own `margin-top: auto`
+     only pins it to the bottom and collapses to nothing on a full card. */
+  .err { margin-top: 22px; color: var(--pink); }
+  .err:not(:empty) { margin-bottom: 10px; }
 
   button.buy {
     margin-top: auto; width: 100%;
