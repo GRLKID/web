@@ -2,8 +2,11 @@
   "name": "grlkid-waitlist",
   "version": "1.0.0",
   "private": true,
-  "description": "GRLKID — landing page + waitlist intake",
+  "description": "GRLKID — landing page, waitlist intake, and shop",
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "stripe": "^17.5.0"
   }
 }

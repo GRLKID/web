@@ -116,8 +116,16 @@
     background: transparent; font-family: inherit; color: var(--ink);
     transition: background .14s ease, color .14s ease, border-color .14s ease;
   }
-  .size:hover { border-color: var(--ink); }
+  .size:hover:not(:disabled) { border-color: var(--ink); }
   .size.sel { background: var(--ink); color: var(--bone); border-color: var(--ink); }
+  .size:disabled {
+    cursor: default; color: rgba(14,14,14,.28); border-color: var(--rule);
+    text-decoration: line-through;
+  }
+
+  .ship { margin-top: 12px; color: var(--pink); }
+  .err { margin-top: 10px; color: var(--pink); min-height: 0; }
+  .err:empty { display: none; }
 
   button.buy {
     margin-top: auto; width: 100%;
@@ -240,8 +248,14 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
+  function shipDate(d) {
+    // Parse as UTC so the date never slips a day west of Greenwich.
+    return new Date(d + "T00:00:00Z").toLocaleDateString("en-US", {
+      month: "long", day: "numeric", year: "numeric", timeZone: "UTC"
+    });
+  }
 
-  fetch(SUPABASE_URL + "/rest/v1/products?select=*&order=sort_order.asc", {
+  fetch(SUPABASE_URL + "/rest/v1/products?select=*,product_variants(size,stock)&order=sort_order.asc", {
     headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY }
   })
     .then(function (r) { return r.json(); })
@@ -257,28 +271,53 @@
     }
     grid.innerHTML = items.map(function (p, i) {
       var n = String(i + 1).padStart(2, "0");
-      var sold = p.status === "sold_out";
+      var vars = p.product_variants || [];
+      var stockOf = function (s) {
+        var v = vars.find(function (x) { return (x.size || null) === (s || null); });
+        return v ? v.stock : 0;
+      };
+      var inStock = vars.reduce(function (t, v) { return t + v.stock; }, 0);
+      // Stock is the real gate, not the status flag -- a run can sell out
+      // before anyone remembers to flip it in /admin.
+      var sold = p.status === "sold_out" || inStock === 0;
+      var pre = p.fulfillment === "preorder";
+
       var shot = p.image_url
         ? '<img src="' + esc(p.image_url) + '" alt="' + esc(p.name) + '" loading="lazy">'
         : '<span class="ph">' + esc(p.name) + '</span>';
+
       var sizes = (p.sizes && p.sizes.length)
         ? '<div class="sizes">' + p.sizes.map(function (s) {
-            return '<button type="button" class="size" data-size="' + esc(s) + '">' + esc(s) + '</button>';
+            var out = stockOf(s) === 0;
+            return '<button type="button" class="size" data-size="' + esc(s) + '"' +
+                   (out ? ' disabled title="Sold out"' : '') + '>' + esc(s) + '</button>';
           }).join("") + '</div>'
         : "";
+
+      // Stated on the card, not just at checkout -- the buyer should know
+      // it's a pre-order before they reach for their wallet.
+      var ship = pre && p.ship_by
+        ? '<div class="micro ship">Pre-order · ships ' + esc(shipDate(p.ship_by)) + '</div>'
+        : "";
+
+      var label = sold ? "Notify me" : (pre ? "Pre-order" : "Add to bag");
+
       return '' +
-        '<article class="card" data-slug="' + esc(p.slug) + '" data-name="' + esc(p.name) + '">' +
+        '<article class="card" data-slug="' + esc(p.slug) + '" data-name="' + esc(p.name) + '"' +
+                ' data-sold="' + (sold ? "1" : "") + '" data-hassizes="' + (p.sizes && p.sizes.length ? "1" : "") + '">' +
           '<div class="shot">' + shot +
             '<span class="idx">' + n + '</span>' +
-            (sold ? '<span class="flag soldout">Sold out</span>' : '') +
+            (sold ? '<span class="flag soldout">Sold out</span>' :
+             pre ? '<span class="flag">Pre-order</span>' : '') +
           '</div>' +
           '<div class="meta"><span class="name">' + esc(p.name) + '</span>' +
             '<span class="price">' + money(p.price_cents, p.currency) + '</span></div>' +
           (p.tagline ? '<div class="micro tagline">' + esc(p.tagline) + '</div>' : '') +
           (p.description ? '<p class="desc">' + esc(p.description) + '</p>' : '') +
+          ship +
           sizes +
-          '<button class="buy"' + (sold ? " disabled" : "") + '>' +
-            (sold ? "Sold out" : "Notify me") + '</button>' +
+          '<div class="err micro"></div>' +
+          '<button class="buy">' + label + '</button>' +
         '</article>';
     }).join("");
 
@@ -293,9 +332,53 @@
       b.addEventListener("click", function () {
         if (b.disabled) return;
         var card = b.closest(".card");
-        openModal(card.dataset.slug, card.dataset.name);
+        // Sold out still collects emails -- a waitlist for a restock is worth
+        // more than a dead button.
+        if (card.dataset.sold) return openModal(card.dataset.slug, card.dataset.name);
+        startCheckout(card, b);
       });
     });
+  }
+
+  function startCheckout(card, btn) {
+    var err = card.querySelector(".err");
+    var sel = card.querySelector(".size.sel");
+    if (card.dataset.hassizes && !sel) {
+      err.textContent = "Pick a size first.";
+      return;
+    }
+    err.textContent = "";
+    var label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Taking you to checkout…";
+
+    fetch("/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        slug: card.dataset.slug,
+        size: sel ? sel.dataset.size : "",
+        qty: 1
+      })
+    })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        if (res.ok && res.d.url) { window.location = res.d.url; return; }
+        btn.disabled = false;
+        btn.textContent = label;
+        // Payments not switched on yet -- fall back to collecting the email
+        // so the page still does something useful before Stripe goes live.
+        if (res.d && res.d.error && /switched on/i.test(res.d.error)) {
+          openModal(card.dataset.slug, card.dataset.name);
+        } else {
+          err.textContent = (res.d && res.d.error) || "Something went wrong. Try again.";
+        }
+      })
+      .catch(function () {
+        btn.disabled = false;
+        btn.textContent = label;
+        err.textContent = "Something went wrong. Try again.";
+      });
   }
 
   function openModal(slug, name) {

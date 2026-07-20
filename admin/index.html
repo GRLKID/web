@@ -78,6 +78,11 @@
   .saved { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--pink); opacity: 0; transition: opacity .2s; }
   .saved.on { opacity: 1; }
 
+  .stock { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 4px; }
+  .stockcell { display: flex; flex-direction: column; width: 72px; }
+  .stockcell .micro { margin-bottom: 2px; }
+  .stockcell input { text-align: center; }
+
   .filelabel { display: inline-block; }
   .filelabel input { display: none; }
 
@@ -207,7 +212,9 @@ async function boot(session) {
 let products = [];
 
 async function loadProducts() {
-  const { data, error } = await sb.from("products").select("*").order("sort_order", { ascending: true });
+  const { data, error } = await sb.from("products")
+    .select("*, product_variants(id, size, stock)")
+    .order("sort_order", { ascending: true });
   if (error) return flash($("appFlash"), "Could not load products: " + error.message, true);
   products = data || [];
   renderList();
@@ -240,6 +247,26 @@ function renderList() {
             </select>
           </label>
           <label class="f"><span class="micro">Sort order</span><input type="number" data-f="sort" value="${p.sort_order}"></label>
+          <label class="f"><span class="micro">Fulfillment</span>
+            <select data-f="fulfillment">
+              <option value="in_stock"${p.fulfillment!=='preorder'?' selected':''}>In stock — ships now</option>
+              <option value="preorder"${p.fulfillment==='preorder'?' selected':''}>Pre-order</option>
+            </select>
+          </label>
+          <label class="f"><span class="micro">Ship by (pre-orders)</span><input type="date" data-f="ship_by" value="${esc(p.ship_by)}"></label>
+          <div class="f wide">
+            <span class="micro">Stock${(p.sizes||[]).length ? ' per size' : ''}</span>
+            <div class="stock">${
+              (p.product_variants || [])
+                .slice()
+                .sort((a, b) => (p.sizes || []).indexOf(a.size) - (p.sizes || []).indexOf(b.size))
+                .map(v => `
+                  <label class="stockcell">
+                    <span class="micro">${v.size ? esc(v.size) : 'Qty'}</span>
+                    <input type="number" min="0" data-v="${v.id}" value="${v.stock}">
+                  </label>`).join("") || '<p class="note">Save the product to create its stock rows.</p>'
+            }</div>
+          </div>
           <label class="f wide"><span class="micro">Tagline</span><input type="text" data-f="tagline" value="${esc(p.tagline)}"></label>
           <label class="f wide"><span class="micro">Description</span><textarea data-f="description">${esc(p.description)}</textarea></label>
         </div>
@@ -262,21 +289,51 @@ list.addEventListener("click", async (e) => {
 
   if (btn.dataset.act === "save") {
     const v = (f) => row.querySelector(`[data-f="${f}"]`).value;
+    const sizes = v("sizes").split(",").map(s => s.trim()).filter(Boolean);
     const patch = {
       name: v("name").trim(),
       slug: slugify(v("slug")),
       price_cents: Math.round(parseFloat(v("price") || "0") * 100),
-      sizes: v("sizes").split(",").map(s => s.trim()).filter(Boolean),
+      sizes,
       status: v("status"),
       sort_order: parseInt(v("sort") || "0", 10),
+      fulfillment: v("fulfillment"),
+      ship_by: v("ship_by") || null,
       tagline: v("tagline").trim(),
       description: v("description").trim(),
       updated_at: new Date().toISOString()
     };
     btn.disabled = true;
     const { error } = await sb.from("products").update(patch).eq("id", id);
+    if (error) { btn.disabled = false; return flash($("appFlash"), "Save failed: " + error.message, true); }
+
+    // Stock counts for the rows that already exist.
+    for (const input of row.querySelectorAll("[data-v]")) {
+      const n = Math.max(parseInt(input.value || "0", 10), 0);
+      const { error: e2 } = await sb.from("product_variants").update({ stock: n }).eq("id", input.dataset.v);
+      if (e2) { btn.disabled = false; return flash($("appFlash"), "Stock save failed: " + e2.message, true); }
+    }
+
+    // Keep stock rows in step with the size list: adding a size creates a row
+    // at zero, removing one deletes it. Without this, a new size would be
+    // unbuyable because checkout has no variant to check against.
+    const existing = (products.find(x => x.id === id)?.product_variants) || [];
+    const want = sizes.length ? sizes : [null];
+    const have = existing.map(x => x.size);
+
+    const toAdd = want.filter(s => !have.includes(s));
+    if (toAdd.length) {
+      const { error: e3 } = await sb.from("product_variants")
+        .insert(toAdd.map(s => ({ product_id: id, size: s, stock: 0 })));
+      if (e3) { btn.disabled = false; return flash($("appFlash"), "Could not add sizes: " + e3.message, true); }
+    }
+    const toDrop = existing.filter(x => !want.includes(x.size)).map(x => x.id);
+    if (toDrop.length) {
+      const { error: e4 } = await sb.from("product_variants").delete().in("id", toDrop);
+      if (e4) { btn.disabled = false; return flash($("appFlash"), "Could not remove sizes: " + e4.message, true); }
+    }
+
     btn.disabled = false;
-    if (error) return flash($("appFlash"), "Save failed: " + error.message, true);
     const tag = row.querySelector(".saved");
     tag.classList.add("on");
     setTimeout(() => tag.classList.remove("on"), 1600);
@@ -334,9 +391,14 @@ $("createBtn").addEventListener("click", async () => {
     sort_order: (products.length ? Math.max(...products.map(p => p.sort_order)) : 0) + 1
   };
   $("createBtn").disabled = true;
-  const { error } = await sb.from("products").insert(row);
+  const { data: created, error } = await sb.from("products").insert(row).select("id").single();
   $("createBtn").disabled = false;
   if (error) return flash($("appFlash"), "Could not create: " + error.message, true);
+
+  // Stock rows start at zero, so a new product can't be bought until you've
+  // actually said how many exist.
+  const want = row.sizes.length ? row.sizes : [null];
+  await sb.from("product_variants").insert(want.map(s => ({ product_id: created.id, size: s, stock: 0 })));
   ["nName","nSlug","nPrice","nSizes","nTagline","nDesc"].forEach(i => $(i).value = "");
   flash($("appFlash"), `"${name}" created as a draft. Set it to Live when it's ready.`);
   loadProducts();
